@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: production
+  labels:
+    app: my-app
+    version: v2.1.0
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: v2.1.0
+    spec:
+      containers:
+      - name: app
+        image: myregistry.com/myapp:v2.1.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DATABASE_URL
+          value: postgresql://prod-db:5432/db
+        - name: REDIS_URL
+          value: redis://localhost:6379
+        - name: CACHE_TTL
+          value: "3600"
+        - name: LOG_LEVEL
+          value: "info"
+        - name: API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: api-key
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5

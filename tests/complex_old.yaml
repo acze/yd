@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  config.yaml: |
+    database:
+      host: localhost
+      port: 3306
+    cache:
+      enabled: true
+      ttl: 300
+  app.yaml: |
+    features:
+      logging: true
+      metrics: false

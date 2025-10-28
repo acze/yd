@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  labels:
+    managed-by: helm
+data:
+  config.yaml: |
+    database:
+      host: prod-db.example.com
+      port: 5432
+      ssl: true
+    cache:
+      disabled: false
+      ttl: 600
+  app.yaml: |
+    features:
+      logging: true
+      metrics: true
+      tracing: false

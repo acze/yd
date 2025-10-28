@@ -1,0 +1,16 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app
+  labels:
+    app: my-app
+spec:
+  replicas: 5
+  template:
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+        - containerPort: 443

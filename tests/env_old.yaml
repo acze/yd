@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: production
+  labels:
+    app: my-app
+    version: v1.0.0
+spec:
+  replicas: 2
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  selector:
+    matchLabels:
+      app: my-app
+  template:
+    metadata:
+      labels:
+        app: my-app
+        version: v1.0.0
+    spec:
+      containers:
+      - name: app
+        image: myregistry.com/myapp:v1.0.0
+        ports:
+        - containerPort: 8080
+        env:
+        - name: DATABASE_URL
+          value: mysql://localhost:3306/db
+        - name: REDIS_URL
+          value: redis://localhost:6379
+        - name: DEBUG_MODE
+          value: "true"
+        - name: MAX_CONNECTIONS
+          value: "100"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "50m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
